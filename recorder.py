@@ -76,4 +76,4 @@ def wget_lct():
 if __name__ == "__main__":
     print('\033[33m========== recording.py ==========\033[0m')
     FileLct = wget_lct()
-    wrecord(FileLct, 5)
+    wrecord(FileLct, 3)

@@ -1,7 +1,16 @@
-from distutils.command.config import config
 import numpy as np
 import pickle
 from pprint import pprint
+from sklearn.exceptions import DataDimensionalityWarning
+
+
+def checkDataFormat(data, Dim=False, Type=np.ndarray):
+    if not type(data) == Type:
+        raise TypeError
+    if Dim == False:
+        pass
+    elif not data.ndim == Dim:
+        raise DataDimensionalityWarning
 
 
 def getVecdist(vec1, vec2):
@@ -10,17 +19,18 @@ def getVecdist(vec1, vec2):
 
 class KNNclass:
 
-    def __init__(self, classdata, classlabel='DefaultLabel'):
-        self.label = classlabel
-        self.data = classdata
+    def __init__(self, data, label='DefaultLabel'):
+        checkDataFormat(data, Dim=2, Type=np.ndarray)
+        self.label = label
+        self.data = data
         self.shape = self.data.shape
-        self.mean = np.mean(classdata, axis=0)
-        self.SD = np.sqrt(np.var(classdata, axis=0))
+        self.mean = np.mean(data, axis=0)
+        self.SD = np.sqrt(np.var(data, axis=0))
 
     def printinfo(self):
-        print('\033[33m%s shape:\033[0m' % (self.label), self.shape)
-        print('\033[33m%s mean:\033[0m' % (self.label), self.mean)
-        print('\033[33m%s SD:\033[0m' % (self.label), self.SD)
+        print('\033[33m\'%s\' shape:\033[0m' % (self.label), self.shape)
+        print('\033[33m\'%s\' mean:\033[0m' % (self.label), self.mean)
+        print('\033[33m\'%s\' SD:\033[0m' % (self.label), self.SD)
 
 
 def incrsDim(nparray):
@@ -32,26 +42,31 @@ def decrsDim(nparray):
 
 
 def getKNNdist(A, B, ret='all'):
+    '''
+    Parameters:
 
+    Return:
+
+    '''
     if type(A) == KNNclass:
-        dataAc = A.data
+        dataA = A.data
     elif type(A) == np.ndarray:
         if A.ndim == 1:
-            dataAc = incrsDim(A)
+            dataA = incrsDim(A)
         else:
-            dataAc = A
+            dataA = A
     if type(B) == KNNclass:
-        dataBc = B.data
+        dataB = B.data
     elif type(B) == np.ndarray:
         if B.ndim == 1:
-            dataBc = incrsDim(B)
+            dataB = incrsDim(B)
         else:
-            dataBc = B
+            dataB = B
 
-    dist = np.zeros((dataAc.shape[0], dataBc.shape[0]))  # 2-D dist
-    for i in range(dataAc.shape[0]):
-        for j in range(dataBc.shape[0]):
-            dist[i, j] = np.linalg.norm(dataAc[i] - dataBc[j])
+    dist = np.zeros((dataA.shape[0], dataB.shape[0]))  # 2-D dist
+    for i in range(dataA.shape[0]):
+        for j in range(dataB.shape[0]):
+            dist[i, j] = np.linalg.norm(dataA[i] - dataB[j])
 
     if dist.shape[0] == 1:
         dist = decrsDim(dist)
@@ -66,7 +81,18 @@ def getKNNdist(A, B, ret='all'):
 
 
 def getKNNclass(vec, KNNclasses, N):
+    '''
+    Parameters:
+        vec:
+            1-D ndarray
+        KNNclasses:
 
+
+    Return:
+        2D - matrix:
+            distmatrix with row == matrix1's row and col == matrix2's row
+            distmatrix[i,j] means vec_dist between matrix1[i] and matrix2[j]
+    '''
     dist = list()
     for knnc in KNNclasses:
         for knnvec in knnc.data:
@@ -81,13 +107,3 @@ def getKNNclass(vec, KNNclasses, N):
 
     return conf
 
-
-if __name__ == '__main__':
-
-    A = KNNclass(np.array([[-3, -2, -3], [-1, -7, -5]]), 'A')
-    A.printinfo()
-
-    B = KNNclass(np.array([[3, 5, 3], [1, 7, 2], [2, 3, 4]]), 'B')
-    B.printinfo()
-
-    print(getKNNclass(np.array([2, 5, 4]), (A, B), N=3))

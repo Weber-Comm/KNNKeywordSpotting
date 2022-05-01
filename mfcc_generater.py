@@ -1,5 +1,4 @@
-from distutils.log import error
-from sqlite3 import DataError
+from aifc import Error
 from python_speech_features import mfcc
 from python_speech_features import logfbank
 from python_speech_features import delta
@@ -13,45 +12,58 @@ import os
 from dataset_controller import *
 
 
-if __name__ == '__main__':
+def getMFCC(str_in_wavfilename, dir='.', ret='MFCC', rateconsistency=16000):
 
-    data_set_dir = os.getcwd() + '.'
+    data_set_dir = os.getcwd() + '\\' +dir
 
     sig = np.array([])
     mfcc_feat = np.reshape(np.array([]), (0, 16))
     mfcc_feat_delta = np.reshape(np.array([]), (0, 16))
 
     for wavfile in os.listdir(data_set_dir):
-        if 'test_0501.wav' in wavfile:
-            print(wavfile)
+        if str_in_wavfilename in wavfile:
+
             (rate, wavdata) = wav.read(data_set_dir + '\\' + wavfile)
-            if not rate == 16000:
-                raise DataError
+            print('\033[33mWavfile %s opened successfully.\033[0m' %
+                  (str_in_wavfilename))
+            if not rate == rateconsistency:
+                print('\033[33mRate Error!!!\033[0m')
+                raise Error
             sig = np.hstack((sig, wavdata))
             mfcc_feat = np.vstack(
                 (mfcc_feat, mfcc(wavdata, rate, numcep=17, nfilt=26)[:, 1:]))  # Dim 1 - 16
             mfcc_feat_delta = np.vstack((mfcc_feat_delta, delta(mfcc_feat, 5)))
 
+    if 'MFCC' in ret:
+        if 'sig' in ret:
+            if 'rate' in ret:
+                return (mfcc_feat, sig, rate)
+            else:
+                return (mfcc_feat, sig)
+        else:
+            return mfcc_feat
+    else:
+        return None
+
+
+if __name__ == '__main__':
+
+    mfcc_feat, sig, rate = getMFCC('test_0501.wav',dir ='dataset\\testset', ret='MFCC + sig + rate')
+
     # clc(sig,)
 
-    # mfcc_feat = mfcc(sig, rate, numcep=17, nfilt=26)[:,1:]
-    # mfcc_feat_delta = delta(mfcc_feat, 1)
-    # mfcc_feat=np.hstack((mfcc_feat,mfcc_feat_delta))
-
-    logfbank_feat = logfbank(sig, rate, nfilt=26)
-
-    print(rate, sig.shape)
-    print(mfcc_feat.shape)
-    print(logfbank_feat.shape)
+    print('\033[33mSigal rate and frame length:\033[0m', rate, sig.shape)
+    print('\033[33mMFCC feature shape:\033[0m', mfcc_feat.shape)
 
     plt.subplots_adjust(left=0.15, hspace=0.5)
 
-    plt.subplot(311)
+    plt.subplot(211)
     plt.plot(np.arange(sig.size)/rate, sig)
     plt.xlim([0, sig.size/rate])
     plt.xlabel('Time')
     plt.ylabel('Signal')
 
+    '''
     plt.subplot(312)
     branch = 0
     if branch == 1:
@@ -62,8 +74,8 @@ if __name__ == '__main__':
                    aspect='auto', interpolation='nearest')
     plt.xlabel('Frame Index')
     plt.ylabel('Log Filter Banks')
-
-    plt.subplot(313)
+    '''
+    plt.subplot(212)
     branch = 0
     if branch == 1:
         plt.plot(mfcc_feat)
@@ -78,4 +90,4 @@ if __name__ == '__main__':
 
     showData(mfcc_feat.T)
 
-    storeData(mfcc_feat, filename='sory_test_0501_', dir='MFCC')
+    # storeData(mfcc_feat, filename='sory_test_0501_', dir='MFCC')
