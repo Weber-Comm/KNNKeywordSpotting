@@ -2,7 +2,7 @@
 
 [ A-Lightweight-Model-for-Keyword-Spotting](https://github.com/Webersan/A-Lightweight-Model-for-Keyword-Spotting) by [Webersan](https://github.com/Webersan)
 
-Here presents a lightweight model for keyword spotting, which ismainly based on KNN method and MFCC. The project is in the development of continuous improvement currently.
+Here presents a lightweight model for keyword spotting, which is mainly based on KNN method and MFCC methods. The project is in the development of continuous improvement currently.
 
 # Environment
 
