@@ -42,9 +42,17 @@ While the program is running, you are supposed to speak to the microphone on you
 
 ```powershell
 Listening...
-c:\PythonProjects\DSP Project\main.py:50: DeprecationWarning: The binary mode of fromstring is deprecated, as it behaves surprisingly on unicode inputs. Use frombuffer instead data_int = np.fromstring(data_bytes, dtype=np.int16)
+c:\PythonProjects\DSP Project\main.py:50: DeprecationWarning:
+The binary mode of fromstring is deprecated, as it behaves surprisingly on unicode inputs.
+Use frombuffer instead data_int = np.fromstring(data_bytes, dtype=np.int16)
 
-NNNNNNNNNNNNNNNNNNNNNNNNNssssssssoooooooorioNNotooooNNNNriririririririNNNNNNoooooooooooooooooooooooNNNNNtttNtNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNtttttNNttriNNsssssssoooooooNNNririririririririririririritNNNNooooooNNNNNttNtNNNNNririririNriNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNriNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+NNNNNNNNNNNNNNNNNNNNNNNNNssssssssoooooooorioNNotoooo
+NNNNriririririririNNNNNNoooooooooooooooooooooooNNNNN
+tttNtNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+NNNNNNNNNtttttNNttriNNsssssssoooooooNNNririririririri
+riririririritNNNNooooooNNNNNttNtNNNNNririririNriNNNN
+NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNriNNNNNNNNNNNNNNNNNN
+NNNNNNNNNNNNNNN
 
 Time cost: 7.512481212615967 s
 Listening Complete.
