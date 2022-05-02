@@ -64,9 +64,9 @@ def getKNNdist(A, B, ret='all'):
             dataB = B
 
     dist = np.zeros((dataA.shape[0], dataB.shape[0]))  # 2-D dist
-    for i in range(dataA.shape[0]):
-        for j in range(dataB.shape[0]):
-            dist[i, j] = np.linalg.norm(dataA[i] - dataB[j])
+
+    dist = [np.linalg.norm(dataA[i] - dataB[j])
+            for i in range(dataA.shape[0]) for j in range(dataB.shape[0])]
 
     if dist.shape[0] == 1:
         dist = decrsDim(dist)
@@ -83,20 +83,17 @@ def getKNNdist(A, B, ret='all'):
 def getKNNclass(vec, KNNclasses, N):
     '''
     Parameters:
-        vec:
-            1-D ndarray
-        KNNclasses:
-
+        vec: 1-D ndarray
+        KNNclasses: (KNNclass A, KNNclass B, ...)
+            a tuple consists of KNNclasses
 
     Return:
-        2D - matrix:
-            distmatrix with row == matrix1's row and col == matrix2's row
-            distmatrix[i,j] means vec_dist between matrix1[i] and matrix2[j]
+        confidence: {A.label: probA, B.label: probB, ...}
+            a dictionary contains the probability that the vec belongs to KNNclasses
+
     '''
-    dist = list()
-    for knnc in KNNclasses:
-        for knnvec in knnc.data:
-            dist.append({'label': knnc.label, 'dist': getVecdist(vec, knnvec)})
+    dist = [{'label': knnc.label, 'dist': getVecdist(vec, knnvec)}
+            for knnc in KNNclasses for knnvec in knnc.data]
 
     dist.sort(key=lambda i: i['dist'])
 
@@ -106,4 +103,3 @@ def getKNNclass(vec, KNNclasses, N):
             for knnc in KNNclasses}
 
     return conf
-

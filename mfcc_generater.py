@@ -1,24 +1,22 @@
-from aifc import Error
 from python_speech_features import mfcc
-from python_speech_features import logfbank
-from python_speech_features import delta
+# from python_speech_features import delta
+# from python_speech_features import logfbank
 
 import numpy as np
-import pickle
-import matplotlib.pyplot as plt
 import scipy.io.wavfile as wav
 import os
-
 from dataset_controller import *
 
 
 def getMFCC(str_in_wavfilename, dir='.', ret='MFCC', rateconsistency=16000):
-
-    data_set_dir = os.getcwd() + '\\' +dir
+    '''
+    Get MFCC from WAVfile
+    '''
+    data_set_dir = os.getcwd() + '\\' + dir
 
     sig = np.array([])
     mfcc_feat = np.reshape(np.array([]), (0, 16))
-    mfcc_feat_delta = np.reshape(np.array([]), (0, 16))
+    # mfcc_feat_delta = np.reshape(np.array([]), (0, 16))
 
     for wavfile in os.listdir(data_set_dir):
         if str_in_wavfilename in wavfile:
@@ -28,11 +26,11 @@ def getMFCC(str_in_wavfilename, dir='.', ret='MFCC', rateconsistency=16000):
                   (str_in_wavfilename))
             if not rate == rateconsistency:
                 print('\033[33mRate Error!!!\033[0m')
-                raise Error
+                raise ValueError
             sig = np.hstack((sig, wavdata))
             mfcc_feat = np.vstack(
                 (mfcc_feat, mfcc(wavdata, rate, numcep=17, nfilt=26)[:, 1:]))  # Dim 1 - 16
-            mfcc_feat_delta = np.vstack((mfcc_feat_delta, delta(mfcc_feat, 5)))
+            # mfcc_feat_delta = np.vstack((mfcc_feat_delta, delta(mfcc_feat, 5)))
 
     if 'MFCC' in ret:
         if 'sig' in ret:
@@ -45,10 +43,10 @@ def getMFCC(str_in_wavfilename, dir='.', ret='MFCC', rateconsistency=16000):
     else:
         return None
 
-
 if __name__ == '__main__':
 
-    mfcc_feat, sig, rate = getMFCC('test_0501.wav',dir ='dataset\\testset', ret='MFCC + sig + rate')
+    mfcc_feat, sig, rate = getMFCC(
+        't_', dir='dataset\\sorybot\\t', ret='MFCC + sig + rate')
 
     # clc(sig,)
 
@@ -57,25 +55,31 @@ if __name__ == '__main__':
 
     plt.subplots_adjust(left=0.15, hspace=0.5)
 
-    plt.subplot(211)
+    plt.subplot(311)
     plt.plot(np.arange(sig.size)/rate, sig)
     plt.xlim([0, sig.size/rate])
     plt.xlabel('Time')
     plt.ylabel('Signal')
 
-    '''
+    CHUNKLEN = 160
+    chunks = int(sig.size/CHUNKLEN)  # floor
+    energy_chunk = np.zeros(chunks)
+    sig_iter = iter(sig)
+    for i in range(chunks):
+        for _ in range(CHUNKLEN):
+            energy_chunk[i] += np.abs(next(sig_iter))
+
+    energy_chunk /= CHUNKLEN
+
+    print(energy_chunk)
+
     plt.subplot(312)
-    branch = 0
-    if branch == 1:
-        plt.plot(logfbank_feat)
-        plt.xlim([0, logfbank_feat.shape[0]])
-    else:
-        plt.imshow(logfbank_feat.T, origin='lower',
-                   aspect='auto', interpolation='nearest')
+    plt.plot(np.arange(chunks), energy_chunk)
+    # plt.xlim([0, logfbank_feat.shape[0]])
     plt.xlabel('Frame Index')
-    plt.ylabel('Log Filter Banks')
-    '''
-    plt.subplot(212)
+    plt.ylabel('Energy')
+
+    plt.subplot(313)
     branch = 0
     if branch == 1:
         plt.plot(mfcc_feat)
@@ -88,6 +92,7 @@ if __name__ == '__main__':
 
     plt.show()
 
-    showData(mfcc_feat.T)
+    showFeat(mfcc_feat.T)
+    plt.show()
 
-    # storeData(mfcc_feat, filename='sory_test_0501_', dir='MFCC')
+    storeData(mfcc_feat, filename='t_', dir='MFCC')
